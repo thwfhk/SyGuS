@@ -1,4 +1,5 @@
 from z3 import *
+import random
 
 verbose = False
 
@@ -84,19 +85,44 @@ def ReadQuery(bmExpr):
     synFunction=SynFunction(SynFunExpr)
 
     class Checker:
-        def __init__(self, VarTable,  synFunction, Constraints):
+        def __init__(self, VarTable, synFunction, Constraints):
             self.VarTable=VarTable
             self.synFunction=synFunction
             self.Constraints=Constraints
             self.solver=Solver()
             self.ces = [] # list of counterexamples
+            self.es = []
+            self.generateExamples()
 
             self.consSpec = []
             for constraint in Constraints:
                 self.consSpec.append('(assert %s)'%(toString(constraint[1:])))
 
+        # maybe useless
+        def generateExamples(self):
+            vars = list(self.VarTable.values())
+            n = len(vars)
+            print(vars, n)
+            for i in range(max(n, 5)):
+                # li = random.sample(range(0, n), n)
+                li = list (map (lambda x : IntVal(random.randint(0, n)), range(n)))
+                # li[i] = max(li) + (random.randint(1,2) == 1) # magic :)
+                print(li)
+                self.es.append(list(zip(vars, li)))
+            print(self.es)
+
+        def checkExamples(self, spec):
+            for subs in self.es:
+                cur = substitute(spec, *subs)
+                # print("cur:", cur, "\nspec:", spec, "\nsubs:", subs)
+                self.solver.push()
+                self.solver.add(cur)
+                if (self.solver.check() == sat):
+                    return True
+                self.solver.pop()
+            return False
+
         def check(self, funcDefStr):
-            self.solver.push()
             spec_smt2 = [funcDefStr] + self.consSpec
             spec_smt2 = '\n'.join(spec_smt2)
             # print("----------------spec_smt2:\n", spec_smt2)
@@ -106,11 +132,15 @@ def ReadQuery(bmExpr):
             if verbose:
                 print("spec:",spec)
 
-            # user counter-examples first
+            # use examples
+            if self.checkExamples(spec) == True:
+                return 1
+            # use counter-examples first
             for model in self.ces:
                 if (model.eval(spec) == True):
                     return model
 
+            self.solver.push()
             self.solver.add(spec)
             res = self.solver.check()
             if res == unsat:
