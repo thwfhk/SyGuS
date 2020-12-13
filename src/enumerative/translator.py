@@ -1,6 +1,6 @@
 from z3 import *
 
-verbose = True
+verbose = False
 
 
 def DeclareVar(sort,name):
@@ -91,51 +91,36 @@ def ReadQuery(bmExpr):
             self.solver=Solver()
             self.ces = [] # list of counterexamples
 
-        def check(self,funcDefStr):
-            self.solver.push()
-            spec_smt2=[funcDefStr]
+            self.consSpec = []
             for constraint in Constraints:
-                spec_smt2.append('(assert %s)'%(toString(constraint[1:])))
-            spec_smt2='\n'.join(spec_smt2)
-            print("spec_smt2: ", spec_smt2)
-            spec = parse_smt2_string(spec_smt2,decls=dict(self.VarTable))
-            spec = And(spec)
-            self.solver.add(Not(spec))
+                self.consSpec.append('(assert %s)'%(toString(constraint[1:])))
+
+        def check(self, funcDefStr):
+            self.solver.push()
+            spec_smt2 = [funcDefStr] + self.consSpec
+            spec_smt2 = '\n'.join(spec_smt2)
+            # print("----------------spec_smt2:\n", spec_smt2)
+            # print("----------------end spec_smt2")
+            spec = parse_smt2_string(spec_smt2, decls = self.VarTable)
+            spec = Not(And(spec)) # spec is a list of constraints
             if verbose:
                 print("spec:",spec)
 
-            res=self.solver.check()
-            if res==unsat:
+            # user counter-examples first
+            for model in self.ces:
+                if (model.eval(spec) == True):
+                    return model
+
+            self.solver.add(spec)
+            res = self.solver.check()
+            if res == unsat:
                 self.solver.pop()
                 return None
             else:
                 model=self.solver.model()
                 self.solver.pop()
-                
+                self.ces.append(model)
                 return model
 
-        def checkWithCe(self,funcDefStr):
-            self.solver.push()
-            spec_smt2=[funcDefStr]
-            for constraint in Constraints:
-                spec_smt2.append('(assert %s)'%(toString(constraint[1:])))
-            spec_smt2='\n'.join(spec_smt2)
-            print("spec_smt2: ", spec_smt2)
-            spec = parse_smt2_string(spec_smt2,decls=dict(self.VarTable))
-            spec = And(spec)
-            self.solver.add(Not(spec))
-            if verbose:
-                print("spec:",spec)
-
-            res=self.solver.check()
-            if res==unsat:
-                self.solver.pop()
-                return None
-            else:
-                model=self.solver.model()
-                self.solver.pop()
-                
-                return model
-    
-    checker=Checker(VarTable, synFunction, Constraints)
+    checker = Checker(VarTable, synFunction, Constraints)
     return checker

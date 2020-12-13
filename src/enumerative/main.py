@@ -43,9 +43,9 @@ if __name__ == '__main__':
   bm = stripComments(benchmarkFile)
   # Parse string to python list
   bmExpr = sexp.sexp.parseString(bm, parseAll=True).asList()[0] 
-  print("begin-------------------------------------")
-  pprint.pprint(bmExpr)
-  print("end-------------------------------------")
+  # print("begin-------------------------------------")
+  # pprint.pprint(bmExpr)
+  # print("end-------------------------------------")
   checker = translator.ReadQuery(bmExpr)
   SynFunExpr = []
   StartSym = 'My-Start-Symbol' #virtual starting symbol
@@ -54,9 +54,9 @@ if __name__ == '__main__':
       continue
     elif expr[0]=='synth-fun':
       SynFunExpr=expr
-  print("Function to Synthesize: ")
-  pprint.pprint(SynFunExpr)
-  print("")
+  # print("Function to Synthesize: ")
+  # pprint.pprint(SynFunExpr)
+  # print("")
   FuncDefine = ['define-fun'] + SynFunExpr[1:4] #copy function signature
   FuncDefineStr = translator.toString(FuncDefine, ForceBracket = True)
   # use Force Bracket = True on function definition. MAGIC CODE. DO NOT MODIFY THE ARGUMENT ForceBracket = True.
@@ -79,10 +79,10 @@ if __name__ == '__main__':
         # You can also utilize type information, but you will suffer from these tuples.
       else:
         Productions[NTName].append(NT)
-  print("Productions:")
-  for symbol, rule in Productions.items():
-    print(symbol, ' -> ', rule)
-  print("")
+  # print("Productions:")
+  # for symbol, rule in Productions.items():
+  #   print(symbol, ' -> ', rule)
+  # print("")
 
   debug = 0
   cnt = 0
@@ -101,7 +101,7 @@ if __name__ == '__main__':
             + FuncDefineStr[-1] # insert Program just before the last bracket ')'
       cnt += 1
       counterexample = checker.check(curStr)
-      print("counterexample: ", counterexample, "\n")
+      # print("counterexample: ", counterexample, "\n")
       if (counterexample == None): # No counter-example
         ans = curStr
         break
