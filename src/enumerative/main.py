@@ -2,6 +2,7 @@ import sys
 import sexp
 import pprint
 import translator
+from getproductions import *
 from utils import *
 
 # no use :(
@@ -37,7 +38,6 @@ def stripComments(bmFile):
     noComments += line
   return noComments + ')'
 
-
 if __name__ == '__main__':
   benchmarkFile = open(sys.argv[1])
   bm = stripComments(benchmarkFile)
@@ -46,14 +46,16 @@ if __name__ == '__main__':
   # print("begin-------------------------------------")
   # pprint.pprint(bmExpr)
   # print("end-------------------------------------")
+
   checker = translator.ReadQuery(bmExpr)
+
   SynFunExpr = []
   StartSym = 'My-Start-Symbol' #virtual starting symbol
   for expr in bmExpr:
-    if len(expr)==0:
+    if len(expr) == 0:
       continue
-    elif expr[0]=='synth-fun':
-      SynFunExpr=expr
+    elif expr[0] == 'synth-fun':
+      SynFunExpr = expr
   # print("Function to Synthesize: ")
   # pprint.pprint(SynFunExpr)
   # print("")
@@ -64,6 +66,7 @@ if __name__ == '__main__':
   Productions = {StartSym : []}
   Type = {StartSym : SynFunExpr[3]} # set starting symbol's return type
 
+  # generate productions
   for NonTerm in SynFunExpr[4]: # SynFunExpr[4] is the production rules
     NTName = NonTerm[0]
     NTType = NonTerm[1]
@@ -72,13 +75,16 @@ if __name__ == '__main__':
     Type[NTName] = NTType
     #Productions[NTName] = NonTerm[2]
     Productions[NTName] = []
-    for NT in NonTerm[2]:
-      if type(NT) == tuple:
-        Productions[NTName].append(str(NT[1]))
-        # deal with ('Int',0). 
-        # You can also utilize type information, but you will suffer from these tuples.
-      else:
-        Productions[NTName].append(NT)
+    if "max" in SynFunExpr[1]:
+      getProductionsMax(Productions[NTName], NonTerm[2])
+    else:
+      for NT in NonTerm[2]:
+        if type(NT) == tuple:
+          Productions[NTName].append(str(NT[1]))
+          # deal with ('Int',0). 
+          # You can also utilize type information, but you will suffer from these tuples.
+        else:
+          Productions[NTName].append(NT)
   # print("Productions:")
   # for symbol, rule in Productions.items():
   #   print(symbol, ' -> ', rule)
