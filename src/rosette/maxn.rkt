@@ -91,7 +91,7 @@
   )
 )
 
-(define (maxn-func x1 x2 x3 x4 x5) (Start x1 x2 x3 x4 x5 4))
+(define (maxn-func x1 x2 x3 x4 x5) (Start x1 x2 x3 x4 x5 5))
 (define M1 (synthesize
             #:forall (list x1 x2 x3 x4 x5)
             #:guarantee (assert (constraint maxn-func x1 x2 x3 x4 x5))))
