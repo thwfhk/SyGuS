@@ -5,16 +5,6 @@ import translator
 from getproductions import *
 from utils import *
 
-# no use :(
-def CheckComplete(Stmts, Productions):
-  for i in range(len(Stmts)):
-    if type(Stmts[i]) == list:
-      if not CheckComplete(Stmts[i], Productions):
-        return False
-    elif Stmts[i] in Productions:
-      return False
-  return True
-
 # terms: [Term]
 def Extend(terms, Productions):
   ret = []

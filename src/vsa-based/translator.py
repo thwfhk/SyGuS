@@ -105,7 +105,7 @@ def ReadQuery(bmExpr):
             print(vars, n)
             for i in range(max(n, 5)):
                 # li = random.sample(range(0, n), n)
-                li = list (map (lambda x : IntVal(random.randint(0, n)), range(n)))
+                li = list(map(lambda x: IntVal(random.randint(0, n)), range(n)))
                 # li[i] = max(li) + (random.randint(1,2) == 1) # magic :)
                 print(li)
                 self.es.append(list(zip(vars, li)))
