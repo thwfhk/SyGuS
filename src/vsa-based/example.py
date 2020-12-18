@@ -43,13 +43,12 @@ class Example:
     # print('\n*********************** recGenVSA', 'expected-value:', ev)
     # oldvsa.print()
 
-    if ev == None:
-      newname = oldvsa.name
-      if newname in self.vsa.mem:
-        return self.vsa.mem[newname]
-      self.vsa.mem.update(oldvsa.vsa.mem)
-      # NOTE: 直接全部update进来，省去一些讨论。要注意vsant的vsa指向没改，但应该不要紧。
-      return self.vsa.mem[newname]
+    # if ev == None:
+    #   newname = oldvsa.name
+    #   if newname in self.vsa.mem:
+    #     return self.vsa.mem[newname]
+    #   self.vsa.mem.update(oldvsa.vsa.mem)
+    #   return self.vsa.mem[newname]
 
     newname = Name(oldvsa.name.ntname, (ev,))
     if newname in self.vsa.mem:
@@ -60,7 +59,7 @@ class Example:
     if oldvsa.kind == 'P':
       newvsa.prods = set()
       for terminal in oldvsa.prods:
-        if self.term2val[terminal] == ev:
+        if ev == None or self.term2val[terminal] == ev:
           newvsa.prods.add(terminal)
       if len(newvsa.prods) == 0:
         newvsa.kind = 'E'
@@ -106,8 +105,12 @@ def model2Example(model, checker):
 # 返回多组可能的赋值
 def witness(funcName, expectedValue, example):
   if funcName == 'ite':
+    if expectedValue == None:
+      return [(None, None, None)]
     return [(True, expectedValue, None), (False, None, expectedValue)]
   if funcName == '<=':
+    if expectedValue == None:
+      return [(None, None)]
     # 分配可能性太多了。优化：只使用terminal的取值
     # print(example.term2val.values())
     li = list(example.term2val.values())
@@ -115,7 +118,7 @@ def witness(funcName, expectedValue, example):
     for x in li:
       for y in li:
         # if (x <= y) == expectedValue:
-        if (x <= y) == expectedValue:
+        if (x <= y) == expectedValue and x != y: # NOTE: ad-hoc!!!!!!!!!
           res.append((x, y))
     # print('res:', res)
     return res
