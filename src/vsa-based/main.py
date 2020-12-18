@@ -28,9 +28,8 @@ def stripComments(bmFile):
     noComments += line
   return noComments + ')'
 
-if __name__ == '__main__':
-  benchmarkFile = open(sys.argv[1])
-  bm = stripComments(benchmarkFile)
+def readSygus(filename):
+  bm = stripComments(open(filename))
   # Parse string to python list
   bmExpr = sexp.sexp.parseString(bm, parseAll=True).asList()[0] 
   # print("begin-------------------------------------")
@@ -40,19 +39,17 @@ if __name__ == '__main__':
   checker = translator.ReadQuery(bmExpr)
 
   SynFunExpr = []
-  StartSym = 'My-Start-Symbol' #virtual starting symbol
   for expr in bmExpr:
     if len(expr) == 0:
       continue
     elif expr[0] == 'synth-fun':
       SynFunExpr = expr
   # print("Function to Synthesize: ")
-  # pprint.pprint(SynFunExpr)
-  # print("")
+  # pprint.pprint(SyFunExpr)
   FuncDefine = ['define-fun'] + SynFunExpr[1:4] #copy function signature
   FuncDefineStr = translator.toString(FuncDefine, ForceBracket = True)
-  # use Force Bracket = True on function definition. MAGIC CODE. DO NOT MODIFY THE ARGUMENT ForceBracket = True.
-  BfsQueue = [[StartSym]] # Top-down
+  # use Force Bracket = True on function definition. MAGIC CODE.
+  StartSym = 'My-Start-Symbol' #virtual starting symbol
   Productions = {StartSym : []}
   Type = {StartSym : SynFunExpr[3]} # set starting symbol's return type
 
@@ -63,7 +60,6 @@ if __name__ == '__main__':
     if NTType == Type[StartSym]:
       Productions[StartSym].append(NTName) # 'My-Start-Symbol' : 'Start'
     Type[NTName] = NTType
-    #Productions[NTName] = NonTerm[2]
     Productions[NTName] = []
     if "max" in SynFunExpr[1]:
       getProductionsMax(Productions[NTName], NonTerm[2])
@@ -72,13 +68,18 @@ if __name__ == '__main__':
         if type(NT) == tuple:
           Productions[NTName].append(str(NT[1]))
           # deal with ('Int',0). 
-          # You can also utilize type information, but you will suffer from these tuples.
         else:
           Productions[NTName].append(NT)
-  # print("Productions:")
-  # for symbol, rule in Productions.items():
-  #   print(symbol, ' -> ', rule)
-  # print("")
+  print("Productions:")
+  for symbol, rule in Productions.items():
+    print(symbol, ' -> ', rule)
+  print("")
+  return checker, StartSym, Productions, FuncDefineStr
+
+
+def main():
+  checker, StartSym, Productions, FuncDefineStr = readSygus(sys.argv[1])
+  BfsQueue = [[StartSym]] # Top-down
 
   debug = 0
   cnt = 0
@@ -96,9 +97,7 @@ if __name__ == '__main__':
       curStr = FuncDefineStr[:-1] + ' ' + translator.toString(cur) \
             + FuncDefineStr[-1] # insert Program just before the last bracket ')'
       cnt += 1
-      counterexample = checker.check(curStr)
-      # print("counterexample: ", counterexample, "\n")
-      if (counterexample == None): # No counter-example
+      if checker.check(curStr): # No counter-example
         ans = curStr
         break
     for term in extend:
@@ -109,8 +108,5 @@ if __name__ == '__main__':
 
   print(ans)
 
-  # Examples of counter-examples  
-  # print (checker.check('(define-fun max2 ((x Int) (y Int)) Int 0)'))
-  # print (checker.check('(define-fun max2 ((x Int) (y Int)) Int x)'))
-  # print (checker.check('(define-fun max2 ((x Int) (y Int)) Int (+ x y))'))
-  # print (checker.check('(define-fun max2 ((x Int) (y Int)) Int (ite (<= x y) y x))'))
+if __name__ == '__main__':
+  main()

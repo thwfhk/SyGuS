@@ -130,15 +130,15 @@ class Checker:
       print("spec:",spec)
 
     # use examples
-    if self.checkExamples(spec) == True:
-      return 'CandyQwQ'
+    if self.checkExamples(spec) == True: # satisfied
+      return False
 
     self.solver.push()
     self.solver.add(spec)
     res = self.solver.check()
     if res == unsat:
       self.solver.pop()
-      return None
+      return True
     else:
       model = self.solver.model()
       self.solver.pop()
@@ -146,7 +146,7 @@ class Checker:
       self.examples.append(example)
       print("\nnew counter-example:")
       example.print()
-      return 'CandyQwQ'
+      return False
 
 def ReadQuery(bmExpr):
   SynFunExpr=[]
