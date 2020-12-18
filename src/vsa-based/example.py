@@ -40,18 +40,18 @@ class Example:
     return self.vsa
 
   def recGenVSA(self, oldvsa: VSANT, ev) -> VSANT:
-    print('\n*********************** recGenVSA', 'expected-value:', ev)
-    oldvsa.print()
+    # print('\n*********************** recGenVSA', 'expected-value:', ev)
+    # oldvsa.print()
 
     if ev == None:
       newname = oldvsa.name
       if newname in self.vsa.mem:
         return self.vsa.mem[newname]
-      newvsa = VSANT(newname, oldvsa.kind, deepcopy(oldvsa.prods), self.vsa)
-      self.vsa.mem[newname] = newvsa
-      return newvsa
+      self.vsa.mem.update(oldvsa.vsa.mem)
+      # NOTE: 直接全部update进来，省去一些讨论。要注意vsant的vsa指向没改，但应该不要紧。
+      return self.vsa.mem[newname]
 
-    newname = Name(oldvsa.name.ntname, (ev))
+    newname = Name(oldvsa.name.ntname, (ev,))
     if newname in self.vsa.mem:
       return self.vsa.mem[newname]
     newvsa = VSANT(newname, oldvsa.kind, None, self.vsa)
@@ -77,17 +77,20 @@ class Example:
       newvsa.prods = []
       funcName = oldvsa.prods[0]
       subevsList = witness(funcName, ev, self)
+      # handle each different witness result
       for subevs, num in zip(subevsList, range(len(subevsList))):
-        subname = Name(oldvsa.name.ntname + str(num), (ev))
+        subname = Name(oldvsa.name.ntname + str(num), (ev,))
         subvsa = VSANT(subname, 'F', (funcName, []), self.vsa)
-        if subname in self.vsa.mem:
-          subvsa = self.vsa.mem[subname]
-        else:
-          self.vsa.mem[subname] = subvsa
-          for nterm, subev in zip(oldvsa.prods[1], subevs):
-            newNterm = self.recGenVSA(oldvsa.vsa.mem[nterm], subev)
-            subvsa.prods[1].append(newNterm.name)
-        newvsa.prods.append(subvsa.name)
+        assert not (subname in self.vsa.mem) # 应该不在里面
+        self.vsa.mem[subname] = subvsa
+        for nterm, subev in zip(oldvsa.prods[1], subevs):
+          newNterm = self.recGenVSA(oldvsa.vsa.mem[nterm], subev)
+          if newNterm.kind == 'E':
+            subvsa.kind = 'E'
+            break
+          subvsa.prods[1].append(newNterm.name)
+        if subvsa.kind != 'E':
+          newvsa.prods.append(subvsa.name)
     # newvsa.print()
     return newvsa
 
@@ -106,17 +109,17 @@ def witness(funcName, expectedValue, example):
     return [(True, expectedValue, None), (False, None, expectedValue)]
   if funcName == '<=':
     # 分配可能性太多了。优化：只使用terminal的取值
-    print(example.term2val.values())
+    # print(example.term2val.values())
     li = list(example.term2val.values())
-    x, y = li
-    if x <= y:
-      if expectedValue:
-        return [(x,y)]
-      else:
-        return [(y,x)]
-    else:
-      if expectedValue:
-        return [(y,x)]
-      else:
-        return [(x,y)]
+    res = []
+    for x in li:
+      for y in li:
+        if (x <= y) == expectedValue:
+          res.append((x, y))
+    print('res:', res)
+    return res
   return None
+
+# None只可能出现在ite中，此时这里是什么值都可以。最后输出程序的话，任意输出一个（比如'x')即可。
+# 在intersection的时候，直接把另一个的取过来。也要把另一个用到的递归拿过来。
+# NOTE: 可以加一些ad-hoc的优化，比如if去掉一般，比如<=时去掉=

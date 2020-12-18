@@ -9,7 +9,6 @@ from getproductions import *
 # terms: [Term]
 def Extend(terms, Productions):
   ret = []
-  # print("len", len(Stmts))
   for i in range(len(terms)):
     term = terms[i]
     if type(term) == list: # term is a function-application
@@ -88,6 +87,8 @@ def main():
   example.print()
   newVSA = example.generateVSA(initialVSA)
   newVSA.print()
+  program = newVSA.dfsProgram(newVSA.mem[newVSA.startSym])
+  print(program)
 
   # naive BFS
   BfsQueue = [[StartSym]] # Top-down

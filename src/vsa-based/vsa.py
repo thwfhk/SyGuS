@@ -1,5 +1,6 @@
 from collections import namedtuple
 from copy import deepcopy
+from random import randint
 
 # Term = 'x' | '0' | 'nt-name' | ['func-name', 'nt-name1', 'nt-name2', ...]
 
@@ -11,7 +12,7 @@ class VSA:
 
   def print(self):
     print("********************************VSA********************************")
-    print("StartSym", self.startSym)
+    print("StartSym:", self.startSym)
     for name, vsant in self.mem.items():
       print('')
       vsant.print()
@@ -63,12 +64,42 @@ class VSA:
             subnewname = self.recurseCFG2VSA(Productions, subprod)
             newvsa.prods[1].append(subnewname)
         curvsa.prods.append(newvsa.name)
-        
+
     return curvsa.name
   
   # remove epsilon productions
+  # 也许在生成的时候已经都去掉了？
   def removeEmpty(self):
     pass
+
+  # generate any program from vsant
+  # select terminals first
+  def generateProgram(self):
+    queue = [self.mem[self.startSym]]
+    while queue != []:
+      vsant = queue.pop(0)
+
+  # NOTE: dfs may never terminate?
+
+  def dfsProgram(self, vsant):
+    print("dfsProgram")
+    vsant.print()
+    if vsant.kind == 'E':
+      Exception('empty kind vsant')
+    if vsant.kind == 'P':
+      return list(vsant.prods)[0]
+    if vsant.kind == 'F':
+      res = '(' + vsant.prods[0]
+      for subnt in vsant.prods[1]:
+        res += ' ' + self.dfsProgram(self.mem[subnt])
+      res += ')'
+      return res
+    if vsant.kind == 'U':
+      # NOTE: just choose the first
+      n = randint(0, len(vsant.prods)-1)
+      return self.dfsProgram(self.mem[vsant.prods[n]])
+      # return self.dfsProgram(self.mem[vsant.prods[0]])
+    Exception('invalid kind', vsant.kind)
 
 
 # VSA non-terminal
@@ -84,16 +115,12 @@ class VSANT:
     self.prods = prods
     self.vsa = vsa
 
-  @staticmethod
-  def empty(name, vsa):
-    return VSANT(name, 'E', None, vsa)
-
   def print(self):
-    print("-----begin VSANT-----")
-    print("name:", self.name)
+    print("---------------------------------------------")
+    print("VSANT:", self.name)
     print(self.kind, self.prods)
     # print(self.vsa)
-    print("-----end VSANT-----")
+    print("---------------------------------------------")
 
 # Name = namedtuple('Name', 'ntname spec')
 # memory : {name : VSANT} ; Map VSANT-names to VSANTs.
