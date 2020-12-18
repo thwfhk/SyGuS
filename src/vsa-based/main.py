@@ -82,6 +82,12 @@ def main():
   checker, StartSym, Productions, FuncDefineStr = readSygus(sys.argv[1])
   initialVSA = VSA()
   initialVSA.CFG2VSA(Productions, StartSym)
+  # initialVSA.print()
+
+  example = checker.generateSingleExample([1,2])
+  example.print()
+  newVSA = example.generateVSA(initialVSA)
+  newVSA.print()
 
   # naive BFS
   BfsQueue = [[StartSym]] # Top-down

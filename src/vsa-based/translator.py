@@ -74,6 +74,14 @@ class Checker:
     self.solver.pop()
     return res.as_long()
 
+  def generateSingleExample(self, vals):
+    vars = list(self.VarTable.keys())
+    example = Example()
+    for var, val in zip(vars, vals):
+      example.term2val[var] = val
+    example.subs = list(zip(self.VarTable.values(), map(IntVal, vals)))
+    example.output = self.getResult(example.subs)
+    return example
 
   examplesMinNum = 3
   # generate examples for max
@@ -89,21 +97,17 @@ class Checker:
     spec = parse_smt2_string(specStr, decls = varTable)
     spec = And(spec)
     self.funcSpec = spec
-    print(spec)
+    # print(spec)
 
     vars = list(self.VarTable.keys())
     n = len(vars)
     for i in range(max(n, Checker.examplesMinNum)):
-      example = Example()
       # li = random.sample(range(0, n), n)
       li = list(map(lambda x: random.randint(0, n), range(n)))
       # li[i] = max(li) + (random.randint(1,2) == 1) # magic :)
-      for var, val in zip(vars, li):
-        example.term2val[var] = val
-      example.subs = list(zip(self.VarTable.values(), map(IntVal, li)))
-      example.output = self.getResult(example.subs)
+      example = self.generateSingleExample(li)
       self.examples.append(example)
-      example.print()
+      # example.print()
     print("-----generateExamples end-----")
 
   # NOTE: 这里是把变量代入后检查约束，而不是检查函数结果是否=output
