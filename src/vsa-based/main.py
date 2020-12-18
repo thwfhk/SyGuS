@@ -82,13 +82,31 @@ def main():
   initialVSA = VSA()
   initialVSA.CFG2VSA(Productions, StartSym)
   # initialVSA.print()
+  program = initialVSA.generateProgram()
+  print(program)
 
+  print('VSA1')
   example = checker.generateSingleExample([1,2])
   example.print()
-  newVSA = example.generateVSA(initialVSA)
-  newVSA.print()
-  program = newVSA.dfsProgram(newVSA.mem[newVSA.startSym])
-  print(program)
+  VSA1 = example.generateVSA(initialVSA)
+  # VSA1.print()
+  program1 = VSA1.generateProgram()
+  print(program1)
+
+  print('VSA2')
+  example = checker.generateSingleExample([2,1])
+  example.print()
+  VSA2 = example.generateVSA(initialVSA)
+  # VSA2.print()
+  program2 = VSA2.generateProgram()
+  print(program2)
+
+  print('VSA3')
+  VSA3 = VSAIntersect(VSA1, VSA2)
+  # VSA3.print()
+  program3 = VSA3.generateProgram()
+  print(program3)
+  return None
 
   # naive BFS
   BfsQueue = [[StartSym]] # Top-down

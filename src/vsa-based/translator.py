@@ -87,7 +87,7 @@ class Checker:
   # generate examples for max
   # NOTE: only consider generate Int value
   def generateRandomExamples(self):
-    print("-----generateExamples begin-----")
+    # print("-----generateExamples begin-----")
     funcStr = Checker.constructFuncStr(self.synFunction.name,\
                 self.synFunction.argList)
     specStr = '\n'.join(self.consSpec).replace(funcStr, 'result')
@@ -108,7 +108,7 @@ class Checker:
       example = self.generateSingleExample(li)
       self.examples.append(example)
       # example.print()
-    print("-----generateExamples end-----")
+    # print("-----generateExamples end-----")
 
   # NOTE: 这里是把变量代入后检查约束，而不是检查函数结果是否=output
   # 效率应该差不多吧

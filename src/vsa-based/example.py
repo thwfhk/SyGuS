@@ -114,9 +114,10 @@ def witness(funcName, expectedValue, example):
     res = []
     for x in li:
       for y in li:
+        # if (x <= y) == expectedValue:
         if (x <= y) == expectedValue:
           res.append((x, y))
-    print('res:', res)
+    # print('res:', res)
     return res
   return None
 
