@@ -83,7 +83,7 @@ class Checker:
     example.output = self.getResult(example.subs)
     return example
 
-  examplesMinNum = 3
+  examplesMinNum = 2
   # generate examples for max
   # NOTE: only consider generate Int value
   def generateRandomExamples(self):
@@ -135,14 +135,14 @@ class Checker:
 
     # use examples
     if self.checkExamples(spec) == True: # satisfied
-      return False
+      return False, None
 
     self.solver.push()
     self.solver.add(spec)
     res = self.solver.check()
     if res == unsat:
       self.solver.pop()
-      return True
+      return True, None
     else:
       model = self.solver.model()
       self.solver.pop()
@@ -150,7 +150,7 @@ class Checker:
       self.examples.append(example)
       print("\nnew counter-example:")
       example.print()
-      return False
+      return False, example
 
 def ReadQuery(bmExpr):
   SynFunExpr=[]

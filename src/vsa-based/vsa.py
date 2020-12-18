@@ -83,8 +83,6 @@ class VSA:
     visit.add(tuple([self.mem[self.startSym]]))
     while not queue.empty():
       length, cur = queue.get()
-      if length > 15:
-        break
       # print(''.join(map(str, cur)))
       finish = True
       for x in cur:
@@ -214,6 +212,9 @@ def vsantIntersect(nt1: VSANT, nt2: VSANT, newVSA: VSA) -> VSANT:
     return res
   else: # both are 'P'
     res.kind = 'P'
+    if type(nt1.prods) != type(nt2.prods):
+      print(nt1.kind, nt2.kind)
+      print(nt1.prods, nt2.prods)
     res.prods = nt1.prods & nt2.prods
     if len(res.prods) == 0:
       res.kind = 'E'

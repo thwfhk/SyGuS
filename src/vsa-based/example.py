@@ -118,12 +118,8 @@ def witness(funcName, expectedValue, example):
     for x in li:
       for y in li:
         # if (x <= y) == expectedValue:
-        if (x <= y) == expectedValue and x != y: # NOTE: ad-hoc!!!!!!!!!
+        if (x <= y) == expectedValue and x != y: # optimization: x <= y is always true
           res.append((x, y))
     # print('res:', res)
     return res
   return None
-
-# None只可能出现在ite中，此时这里是什么值都可以。最后输出程序的话，任意输出一个（比如'x')即可。
-# 在intersection的时候，直接把另一个的取过来。也要把另一个用到的递归拿过来。
-# NOTE: 可以加一些ad-hoc的优化，比如if去掉一般，比如<=时去掉=

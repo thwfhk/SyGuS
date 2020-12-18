@@ -76,8 +76,7 @@ def readSygus(filename):
   # print("")
   return checker, StartSym, Productions, FuncDefineStr
 
-
-def main():
+def debugTest():
   checker, StartSym, Productions, FuncDefineStr = readSygus(sys.argv[1])
   initialVSA = VSA()
   initialVSA.CFG2VSA(Productions, StartSym)
@@ -106,36 +105,35 @@ def main():
   # VSA3.print()
   program3 = VSA3.generateProgram()
   print(program3)
-  return None
 
-  # naive BFS
-  BfsQueue = [[StartSym]] # Top-down
-  debug = 0
-  cnt = 0
-  ans = -1
-  visit = set()
-  while (BfsQueue != []):
-    cur = BfsQueue.pop(0)
-    # print("Extending "+str(cur))
-    extend = Extend(cur, Productions)
-    debug += 1
-    if (debug <= 0):
-      print("Extending "+str(cur))
-      printlist(extend, "Extended:")
-    if (extend == []): # Nothing to extend. We have a solution.
-      curStr = FuncDefineStr[:-1] + ' ' + translator.toString(cur) \
-            + FuncDefineStr[-1] # insert Program just before the last bracket ')'
-      cnt += 1
-      if checker.check(curStr): # No counter-example
-        ans = curStr
-        break
-    for term in extend:
-      termStr = str(term)
-      if not termStr in visit:
-        BfsQueue.append(term)
-        visit.add(termStr)
+def CEGIS(curVSA, checker):
+  program = curVSA.generateProgram()
+  print(program)
+  # while True:
+  #   res, example = checker.check(program)
+  #   if res:
+  #     return program
+  #   elif example:
+  #     tmpVSA = example.generateVSA(initialVSA)
+  #     curVSA = VSAIntersect(curVSA, tmpVSA)
+  # return None
 
-  print(ans)
+  
+
+def main():
+  checker, StartSym, Productions, FuncDefineStr = readSygus(sys.argv[1])
+  initialVSA = VSA()
+  initialVSA.CFG2VSA(Productions, StartSym)
+  # initialVSA.print()
+  curVSA = None
+  for example in checker.examples:
+    example.print()
+    tmpVSA = example.generateVSA(initialVSA)
+    if curVSA == None:
+      curVSA = tmpVSA
+    else:
+      curVSA = VSAIntersect(curVSA, tmpVSA)
+  CEGIS(curVSA, checker)
 
 if __name__ == '__main__':
   main()
