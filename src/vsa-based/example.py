@@ -16,13 +16,14 @@ def getSort(sort):
 
 class Example:
   def __init__(self):
-    self.mem = {}      # type: Dict[str, VSANT]
+    self.vsa = None      # type: VSA
     self.term2val = {} # type: Dict[str, value]
     self.output = None # type: value
     self.subs = []     # type: List[(z3symbol, z3val)]
   def print(self):
     print("----------[Example]----------")
-    print("mem:", self.mem)
+    if self.vsa:
+      self.vsa.print()
     print("term2val:", self.term2val)
     print("output:", self.output)
     print("subs:", self.subs)

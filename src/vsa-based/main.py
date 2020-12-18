@@ -2,8 +2,9 @@ import sys
 import sexp
 import pprint
 import translator
-from getproductions import *
+from vsa import *
 from utils import *
+from getproductions import *
 
 # terms: [Term]
 def Extend(terms, Productions):
@@ -70,17 +71,20 @@ def readSygus(filename):
           # deal with ('Int',0). 
         else:
           Productions[NTName].append(NT)
-  print("Productions:")
-  for symbol, rule in Productions.items():
-    print(symbol, ' -> ', rule)
-  print("")
+  # print("Productions:")
+  # for symbol, rule in Productions.items():
+  #   print(symbol, ' -> ', rule)
+  # print("")
   return checker, StartSym, Productions, FuncDefineStr
 
 
 def main():
   checker, StartSym, Productions, FuncDefineStr = readSygus(sys.argv[1])
-  BfsQueue = [[StartSym]] # Top-down
+  initialVSA = VSA()
+  initialVSA.CFG2VSA(Productions, StartSym)
 
+  # naive BFS
+  BfsQueue = [[StartSym]] # Top-down
   debug = 0
   cnt = 0
   ans = -1
