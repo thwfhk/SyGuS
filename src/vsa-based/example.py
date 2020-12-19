@@ -1,5 +1,6 @@
 from z3 import *
 from vsa import *
+from utils import *
 
 def DeclareVar(sort, name):
   if sort=='Int':
@@ -96,10 +97,21 @@ class Example:
 
 def model2Example(model, checker):
   example = Example()
+  name2Value = {}
   for var in model.decls():
-    example.term2val[str(var)] = model[var].as_long()
-    example.subs.append((Int(str(var)), model[var]))
+    name2Value[str(var)] = model[var]
+  for var in checker.VarTable:
+    if var in name2Value:
+      example.term2val[var] = name2Value[var]
+      example.subs.append((Int(var), name2Value[var]))
+      # NOTE: only consider Int sort here
+    else:
+      example.term2val[var] = 0
+      example.subs.append((Int(var), IntVal(0)))
   example.output = checker.getResult(example.subs)
+  # print('subs', example.subs)
+  # for x, y in example.subs:
+  #   print(x, type(x), y, type(y))
   return example
 
 

@@ -31,7 +31,6 @@ def toString(Expr,Bracket=True,ForceBracket=False):
 class SynFunction:
   def __init__(self, SynFunExpr):
     self.name=SynFunExpr[1]
-    # TODO: arg and ret sort
     self.argList=SynFunExpr[2]
     self.retSort=SynFunExpr[3]
     self.Sorts=[]
@@ -46,7 +45,6 @@ class Checker:
     self.synFunction=synFunction
     self.Constraints=Constraints
     self.solver=Solver()
-    # self.ces = [] # list of counterexamples
     self.examples = []
     self.funcSpec = None # spec of function result
     self.consSpec = []
@@ -132,12 +130,10 @@ class Checker:
     # print("----------------end spec_smt2")
     spec = parse_smt2_string(spec_smt2, decls = self.VarTable)
     spec = Not(And(spec)) # spec is a list of constraints
-    if verbose:
-      print("spec:",spec)
 
-    # use examples
-    if self.checkExamples(spec) == True: # satisfied
-      return False, None
+    # use examples NOTE: not needed in vsa-based
+    # if self.checkExamples(spec) == True: # satisfied
+    #   return False, None
 
     self.solver.push()
     self.solver.add(spec)
