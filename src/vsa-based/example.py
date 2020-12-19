@@ -90,7 +90,8 @@ class Example:
           subvsa.prods[1].append(newNterm.name)
         if subvsa.kind != 'E':
           newvsa.prods.append(subvsa.name)
-    # newvsa.print()
+      if len(newvsa.prods) == 0:
+        newvsa.kind = 'E'
     return newvsa
 
 def model2Example(model, checker):
@@ -115,10 +116,10 @@ def witness(funcName, expectedValue, example):
     # print(example.term2val.values())
     li = list(example.term2val.values())
     res = []
-    for x in li:
-      for y in li:
+    for i, x in enumerate(li):
+      for j, y in enumerate(li):
         # if (x <= y) == expectedValue:
-        if (x <= y) == expectedValue and x != y: # optimization: x <= y is always true
+        if (x <= y) == expectedValue and i != j: # optimization: x <= y is always true
           res.append((x, y))
     # print('res:', res)
     return res

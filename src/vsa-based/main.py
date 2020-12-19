@@ -85,12 +85,13 @@ def debugTest():
   print(program)
 
   print('VSA1')
-  example = checker.generateSingleExample([1,2])
+  example = checker.generateSingleExample([1,1])
   example.print()
   VSA1 = example.generateVSA(initialVSA)
   # VSA1.print()
   program1 = VSA1.generateProgram()
   print(program1)
+  # return None
 
   print('VSA2')
   example = checker.generateSingleExample([2,1])
@@ -106,19 +107,18 @@ def debugTest():
   program3 = VSA3.generateProgram()
   print(program3)
 
-def CEGIS(curVSA, checker):
-  program = curVSA.generateProgram()
-  print(program)
-  # while True:
-  #   res, example = checker.check(program)
-  #   if res:
-  #     return program
-  #   elif example:
-  #     tmpVSA = example.generateVSA(initialVSA)
-  #     curVSA = VSAIntersect(curVSA, tmpVSA)
-  # return None
-
-  
+def CEGIS(curVSA, checker, FuncDefineStr, initialVSA):
+  while True:
+    program = curVSA.generateProgram()
+    funcStr = FuncDefineStr[:-1] + ' ' + program + FuncDefineStr[-1]
+    print(funcStr)
+    res, example = checker.check(funcStr)
+    if res:
+      return funcStr
+    elif example:
+      tmpVSA = example.generateVSA(initialVSA)
+      curVSA = VSAIntersect(curVSA, tmpVSA)
+  return None
 
 def main():
   checker, StartSym, Productions, FuncDefineStr = readSygus(sys.argv[1])
@@ -133,7 +133,8 @@ def main():
       curVSA = tmpVSA
     else:
       curVSA = VSAIntersect(curVSA, tmpVSA)
-  CEGIS(curVSA, checker)
+  CEGIS(curVSA, checker, FuncDefineStr, initialVSA)
 
 if __name__ == '__main__':
+  # debugTest()
   main()

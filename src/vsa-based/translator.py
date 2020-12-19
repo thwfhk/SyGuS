@@ -84,6 +84,7 @@ class Checker:
     return example
 
   examplesMinNum = 2
+  examplesNum = 1
   # generate examples for max
   # NOTE: only consider generate Int value
   def generateRandomExamples(self):
@@ -101,7 +102,8 @@ class Checker:
 
     vars = list(self.VarTable.keys())
     n = len(vars)
-    for i in range(max(n, Checker.examplesMinNum)):
+    # for i in range(max(n, Checker.examplesMinNum)):
+    for i in range(Checker.examplesNum):
       # li = random.sample(range(0, n), n)
       li = list(map(lambda x: random.randint(0, n), range(n)))
       # li[i] = max(li) + (random.randint(1,2) == 1) # magic :)

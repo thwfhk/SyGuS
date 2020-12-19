@@ -88,7 +88,7 @@ class VSA:
       for x in cur:
         if type(x) != str:
           finish = False
-      if finish and len(cur) > 1:
+      if finish: # and len(cur) > 1:
         # print(len(cur))
         return ''.join(cur)
 
