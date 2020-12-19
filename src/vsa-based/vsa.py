@@ -227,6 +227,7 @@ def VSAIntersect(VSA1: VSA, VSA2: VSA) -> VSA:
 def vsantIntersect(nt1: VSANT, nt2: VSANT, newVSA: VSA) -> VSANT:
   # if nt1.name[0] != nt2.name[0]:
     # return VSANT('', 'E', None, exam)
+  # NOTE: 命名的时候要保持VSA1的在前面, 调换后要注意一下
   resname = Name('(' + nt1.name[0] + ')*(' + nt2.name[0] + ')',\
               nt1.name[1] + nt2.name[1])
 
@@ -235,14 +236,20 @@ def vsantIntersect(nt1: VSANT, nt2: VSANT, newVSA: VSA) -> VSANT:
   res = VSANT(resname, '', None, newVSA)
   newVSA.mem[resname] = res
 
-  if nt2.kind == 'U':
+  exchange = False
+  # if nt2.kind == 'U':
+  if nt2.kind == 'U' and nt1.kind != 'U':
     nt1, nt2 = nt2, nt1
+    exchange = True # exchange之后只会在下个if里用到
   if nt1.kind == 'U':
     res.kind = 'U'
     res.prods = []
-    for name in nt1.prods:
-      nt = nt1.vsa.mem[name]
-      newnt = vsantIntersect(nt, nt2, newVSA)
+    for subntName in nt1.prods:
+      subnt = nt1.vsa.mem[subntName]
+      if exchange:
+        newnt = vsantIntersect(nt2, subnt, newVSA)
+      else:
+        newnt = vsantIntersect(subnt, nt2, newVSA)
       if newnt.kind != 'E':
         res.prods.append(newnt.name)
     if len(res.prods) == 0:
@@ -255,26 +262,23 @@ def vsantIntersect(nt1: VSANT, nt2: VSANT, newVSA: VSA) -> VSANT:
       return res
     res.kind = 'F'
     res.prods = (nt1.prods[0], [])
-    for nt1name, nt2name in zip(nt1.prods[1], nt2.prods[1]):
-      tmp1 = nt1.vsa.mem[nt1name]
-      tmp2 = nt2.vsa.mem[nt2name]
-      newnt = vsantIntersect(tmp1, tmp2, newVSA)
-      if newnt == 'E':
+    for subnt1Name, subnt2Name in zip(nt1.prods[1], nt2.prods[1]):
+      subnt1 = nt1.vsa.mem[subnt1Name]
+      subnt2 = nt2.vsa.mem[subnt2Name]
+      newnt = vsantIntersect(subnt1, subnt2, newVSA)
+      if newnt.kind == 'E':
         res.kind = 'E'
         break
       res.prods[1].append(newnt.name)
     return res
 
-  if nt2.kind == 'P':
+  if nt2.kind == 'P' and nt1.kind != 'P':
     nt1, nt2 = nt2, nt1
   if nt1.kind == 'P' and nt2.kind == 'F':
     res.kind = 'E'
     return res
   else: # both are 'P'
     res.kind = 'P'
-    if type(nt1.prods) != type(nt2.prods):
-      print(nt1.kind, nt2.kind)
-      print(nt1.prods, nt2.prods)
     res.prods = nt1.prods & nt2.prods
     if len(res.prods) == 0:
       res.kind = 'E'

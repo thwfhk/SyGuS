@@ -89,7 +89,14 @@ def readSygus(filename):
   # print("")
   return checker, StartSym, Productions, FuncDefineStr
 
-def debugTest():
+def countNtermNum(vsa):
+  cnt = 0
+  for x in vsa.mem.values():
+    if x.kind != 'E':
+      cnt += 1
+  return cnt
+
+def debugTest(verbose = False):
   checker, StartSym, Productions, FuncDefineStr = readSygus(sys.argv[1])
   initialVSA = VSA()
   initialVSA.CFG2VSA(Productions, StartSym)
@@ -99,48 +106,48 @@ def debugTest():
   # return None
 
   print('VSA1')
-  example = checker.generateSingleExample([1,0,0])
+  example = checker.generateSingleExample([1,0])
   example.print()
   VSA1 = example.generateVSA(initialVSA)
-  # VSA1.print()
+  if verbose:
+    VSA1.print()
   program1 = VSA1.generateProgram()
   print(program1)
 
   print('VSA2')
-  example = checker.generateSingleExample([0,1,0])
+  example = checker.generateSingleExample([0,1])
   example.print()
   VSA2 = example.generateVSA(initialVSA)
-  # VSA2.print()
+  if verbose:
+    VSA2.print()
   program2 = VSA2.generateProgram()
   print(program2)
 
-  print('VSA3')
-  example = checker.generateSingleExample([0,0,1])
-  example.print()
-  VSA3 = example.generateVSA(initialVSA)
-  # VSA3.print()
-  program3 = VSA3.generateProgram()
-  print(program3)
+  # print('VSA3')
+  # example = checker.generateSingleExample([0,0,1])
+  # example.print()
+  # VSA3 = example.generateVSA(initialVSA)
+  # # VSA3.print()
+  # program3 = VSA3.generateProgram()
+  # print(program3)
 
   print('VSA FINAL')
   VSAfinal = VSAIntersect(VSA1, VSA2)
-  # VSAfinal.print()
+  if verbose:
+    VSAfinal.print()
   program12 = VSAfinal.generateProgram()
+  tmp = VSAfinal.generateProgramBFS()
   print(program12)
-  VSAfinal = VSAIntersect(VSAfinal, VSA3)
+  print(tmp)
 
-  mem = VSAfinal.mem
-  cnt = 0
-  for x in mem.values():
-    if x.kind != 'E':
-      cnt += 1
-  print(cnt)
-  # VSAfinal.print()
-  program = VSAfinal.generateProgram()
-  print(program)
+  # VSAfinal = VSAIntersect(VSAfinal, VSA3)
+  # # VSAfinal.print()
+  # program = VSAfinal.generateProgram()
+  # print(program)
 
 def CEGIS(curVSA, checker, FuncDefineStr, initialVSA):
   while True:
+    print('curVSA size:', countNtermNum(curVSA))
     program = curVSA.generateProgram()
     funcStr = FuncDefineStr[:-1] + ' ' + program + FuncDefineStr[-1]
     print(funcStr)
@@ -153,7 +160,8 @@ def CEGIS(curVSA, checker, FuncDefineStr, initialVSA):
   return None
 
 def main():
-  sys.setrecursionlimit(3000)
+  # print (sys.getrecursionlimit())
+  sys.setrecursionlimit(1000)
   checker, StartSym, Productions, FuncDefineStr = readSygus(sys.argv[1])
   initialVSA = VSA()
   initialVSA.CFG2VSA(Productions, StartSym)
@@ -169,5 +177,5 @@ def main():
   CEGIS(curVSA, checker, FuncDefineStr, initialVSA)
 
 if __name__ == '__main__':
-  # debugTest()
-  main()
+  debugTest()
+  # main()

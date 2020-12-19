@@ -127,8 +127,8 @@ def witness(funcName, expectedValue, example):
     for i, x in enumerate(li):
       for j, y in enumerate(li):
         # if (x <= y) == expectedValue:
-        if (x <= y) == expectedValue and i != j: # optimization: x <= y is always true
-        # if (x <= y) == expectedValue and x != y: # optimization: x <= y is always true
+        # if (x <= y) == expectedValue and i != j: # optimization: x <= y is always true
+        if (x <= y) == expectedValue and x != y: # NOTE: MAY BE WRONG!
           res.append((x, y))
     # print('res:', res)
     return res
