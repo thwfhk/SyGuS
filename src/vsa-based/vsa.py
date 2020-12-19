@@ -1,7 +1,7 @@
 from collections import namedtuple
 from copy import deepcopy
 from random import randint
-from queue import PriorityQueue
+from queue import PriorityQueue, Queue
 
 # Term = 'x' | '0' | 'nt-name' | ['func-name', 'nt-name1', 'nt-name2', ...]
 
@@ -75,50 +75,110 @@ class VSA:
 
   # generate any program from vsant
   # select terminals first
-  def generateProgram(self):
-    # queue = [[self.mem[self.startSym]]]
+  def generateProgramBFS(self):
     queue = PriorityQueue()
-    queue.put((1, [self.mem[self.startSym]]))
+    # queue = Queue()
+    start = Program([self.mem[self.startSym]], 1)
+    queue.put(start)
     visit = set()
-    visit.add(tuple([self.mem[self.startSym]]))
+    visit.add(start)
     while not queue.empty():
-      length, cur = queue.get()
-      # print(''.join(map(str, cur)))
+      cur: Program = queue.get()
+      # print(''.join(map(str, cur.prog)))
       finish = True
-      for x in cur:
+      for x in cur.prog:
         if type(x) != str:
           finish = False
       if finish: # and len(cur) > 1:
         # print(len(cur))
-        return ''.join(cur)
+        return ''.join(cur.prog)
 
-      for x, i in zip(cur, range(len(cur))):
-        if type(x) == str:
-          continue
-        elif x.kind == 'E':
-          Exception('empty kind of vsant is not valid when generating programs')
-        elif x.kind == 'P':
-          cur[i] = next(iter(x.prods))
-          if not tuple(cur) in visit:
-            queue.put((len(cur), cur))
-            visit.add(tuple(cur))
-        elif x.kind == 'F':
-          new = ['(', x.prods[0]]
-          for subnt in x.prods[1]:
-            new += [' ', self.mem[subnt]]
-          new += [')']
-          cur[i:i+1] = new
-          if not tuple(cur) in visit:
-            queue.put((len(cur), cur))
-            visit.add(tuple(cur))
-        else: # x.kind == 'U'
+      hasPF = True
+      while hasPF:
+        hasPF = False
+        for i, x in enumerate(cur.prog):
+          if type(x) == str:
+            continue
+          elif x.kind == 'E':
+            Exception('empty kind of vsant is not valid when generating programs')
+          elif x.kind == 'P':
+            cur.prog[i] = next(iter(x.prods))
+            cur.vsantNum -= 1
+          elif x.kind == 'F':
+            new = Program([], 0)
+            new.prog = ['(', x.prods[0]]
+            for subntname in x.prods[1]:
+              subnt = self.mem[subntname]
+              new.prog += [' ', subnt]
+              new.vsantNum += 1
+              if subnt.kind in ('P', 'F'):
+                hasPF = True
+            new.prog += [')']
+            cur.prog[i:i+1] = new.prog
+            cur.vsantNum += new.vsantNum - 1
+      hasU = False
+      for i, x in enumerate(cur.prog):
+        if type(x) != str and x.kind == 'U':
+          hasU = True
           for nt in x.prods:
             new = cur.copy()
-            new[i] = self.mem[nt]
-            if not tuple(new) in visit:
-              queue.put((len(new), new))
-              visit.add(tuple(new))
+            new.prog[i] = self.mem[nt]
+            if not new in visit:
+              queue.put(new)
+              visit.add(new)
+      if not hasU:
+        if not cur in visit:
+          queue.put(cur)
+          visit.add(cur)
     return "NO PROGRAM FOUNDED :("
+
+  def generateProgram(self):
+    programTable = {}
+    # base:
+    for nt in self.mem.values():
+      if nt.kind == 'P':
+        programTable[nt.name] = [next(iter(nt.prods))]
+    # induction:
+    updating = True
+    while not self.startSym in programTable and updating:
+      updating = False
+      for nt in self.mem.values():
+        if nt.kind == 'E':
+          continue
+        if not nt.name in programTable:
+          if nt.kind == 'U':
+            for subntName in nt.prods:
+              if subntName in programTable:
+                programTable[nt.name] = programTable[subntName]
+                updating = True
+                break
+          elif nt.kind == 'F':
+            prog = ['(', nt.prods[0]]
+            flag = True
+            for subntName in nt.prods[1]:
+              if not subntName in programTable:
+                flag = False
+                break
+              prog += [' '] + programTable[subntName]
+            if flag:
+              programTable[nt.name] = prog + [')']
+              updating = True
+    if self.startSym in programTable:
+      return ''.join(programTable[self.startSym])
+    else:
+      return "NO PROGRAM FOUNDED :("
+
+
+class Program:
+  def __init__(self, prog, num):
+    self.prog = prog
+    self.vsantNum = num
+  def __hash__(self):
+    return hash(tuple(self.prog))
+  def __gt__(self, other):
+    return self.vsantNum > other.vsantNum
+  def copy(self):
+    return Program(self.prog.copy(), self.vsantNum)
 
 
 # VSA non-terminal

@@ -1,25 +1,10 @@
 import sys
 import sexp
 import pprint
-import translator
+from checker import *
 from vsa import *
 from utils import *
 from getproductions import *
-
-# terms: [Term]
-def Extend(terms, Productions):
-  ret = []
-  for i in range(len(terms)):
-    term = terms[i]
-    if type(term) == list: # term is a function-application
-      extend = Extend(term, Productions)
-      if extend != []:
-        for exTerm in extend:
-          ret.append(terms[0:i] + [exTerm] + terms[i+1:])
-    elif term in Productions: # term is a symbol (T or NT)
-      for exTerm in Productions[term]:
-        ret.append(terms[0:i] + [exTerm] + terms[i+1:])
-  return ret
 
 def stripComments(bmFile):
   noComments = '('
@@ -27,6 +12,34 @@ def stripComments(bmFile):
     line = line.split(';', 1)[0]
     noComments += line
   return noComments + ')'
+
+def readQuery(bmExpr):
+  SynFunExpr=[]
+  VarDecMap={}
+  Constraints=[]
+  FunDefMap={}
+  for expr in bmExpr:
+    if len(expr)==0:
+      continue
+    elif expr[0]=='synth-fun':
+      SynFunExpr=expr
+    elif expr[0]=='declare-var':
+      VarDecMap[expr[1]]=expr
+    elif expr[0]=='constraint':
+      Constraints.append(expr)
+    elif expr[0]=='define-fun':
+      FunDefMap[expr[1]]=expr
+  
+  VarTable={}
+  # Declare Var
+  for var in VarDecMap:
+    VarTable[var] = DeclareVar(VarDecMap[var][2], var)
+
+  # Declare Target Function
+  synFunction=SynFunction(SynFunExpr)
+
+  checker = Checker(VarTable, synFunction, Constraints)
+  return checker
 
 def readSygus(filename):
   bm = stripComments(open(filename))
@@ -36,7 +49,7 @@ def readSygus(filename):
   # pprint.pprint(bmExpr)
   # print("end-------------------------------------")
 
-  checker = translator.ReadQuery(bmExpr)
+  checker = readQuery(bmExpr)
 
   SynFunExpr = []
   for expr in bmExpr:
@@ -47,7 +60,7 @@ def readSygus(filename):
   # print("Function to Synthesize: ")
   # pprint.pprint(SyFunExpr)
   FuncDefine = ['define-fun'] + SynFunExpr[1:4] #copy function signature
-  FuncDefineStr = translator.toString(FuncDefine, ForceBracket = True)
+  FuncDefineStr = toString(FuncDefine, ForceBracket = True)
   # use Force Bracket = True on function definition. MAGIC CODE.
   StartSym = 'My-Start-Symbol' #virtual starting symbol
   Productions = {StartSym : []}
@@ -81,20 +94,20 @@ def debugTest():
   initialVSA = VSA()
   initialVSA.CFG2VSA(Productions, StartSym)
   # initialVSA.print()
-  program = initialVSA.generateProgram()
-  print(program)
+  program0 = initialVSA.generateProgram()
+  print(program0)
+  # return None
 
   print('VSA1')
-  example = checker.generateSingleExample([1,1])
+  example = checker.generateSingleExample([1,0,0])
   example.print()
   VSA1 = example.generateVSA(initialVSA)
   # VSA1.print()
   program1 = VSA1.generateProgram()
   print(program1)
-  # return None
 
   print('VSA2')
-  example = checker.generateSingleExample([2,1])
+  example = checker.generateSingleExample([0,1,0])
   example.print()
   VSA2 = example.generateVSA(initialVSA)
   # VSA2.print()
@@ -102,10 +115,29 @@ def debugTest():
   print(program2)
 
   print('VSA3')
-  VSA3 = VSAIntersect(VSA1, VSA2)
+  example = checker.generateSingleExample([0,0,1])
+  example.print()
+  VSA3 = example.generateVSA(initialVSA)
   # VSA3.print()
   program3 = VSA3.generateProgram()
   print(program3)
+
+  print('VSA FINAL')
+  VSAfinal = VSAIntersect(VSA1, VSA2)
+  # VSAfinal.print()
+  program12 = VSAfinal.generateProgram()
+  print(program12)
+  VSAfinal = VSAIntersect(VSAfinal, VSA3)
+
+  mem = VSAfinal.mem
+  cnt = 0
+  for x in mem.values():
+    if x.kind != 'E':
+      cnt += 1
+  print(cnt)
+  # VSAfinal.print()
+  program = VSAfinal.generateProgram()
+  print(program)
 
 def CEGIS(curVSA, checker, FuncDefineStr, initialVSA):
   while True:
@@ -121,6 +153,7 @@ def CEGIS(curVSA, checker, FuncDefineStr, initialVSA):
   return None
 
 def main():
+  sys.setrecursionlimit(3000)
   checker, StartSym, Productions, FuncDefineStr = readSygus(sys.argv[1])
   initialVSA = VSA()
   initialVSA.CFG2VSA(Productions, StartSym)

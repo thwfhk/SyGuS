@@ -99,19 +99,15 @@ def model2Example(model, checker):
   example = Example()
   name2Value = {}
   for var in model.decls():
-    name2Value[str(var)] = model[var]
+    name2Value[str(var)] = model[var].as_long()
+    # NOTE: only consider Int sort here
+  li = []
   for var in checker.VarTable:
     if var in name2Value:
-      example.term2val[var] = name2Value[var]
-      example.subs.append((Int(var), name2Value[var]))
-      # NOTE: only consider Int sort here
+      li.append(name2Value[var])
     else:
-      example.term2val[var] = 0
-      example.subs.append((Int(var), IntVal(0)))
-  example.output = checker.getResult(example.subs)
-  # print('subs', example.subs)
-  # for x, y in example.subs:
-  #   print(x, type(x), y, type(y))
+      li.append(0)
+  example = checker.generateSingleExample(li)
   return example
 
 
@@ -132,6 +128,7 @@ def witness(funcName, expectedValue, example):
       for j, y in enumerate(li):
         # if (x <= y) == expectedValue:
         if (x <= y) == expectedValue and i != j: # optimization: x <= y is always true
+        # if (x <= y) == expectedValue and x != y: # optimization: x <= y is always true
           res.append((x, y))
     # print('res:', res)
     return res
