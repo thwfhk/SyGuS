@@ -237,8 +237,8 @@ def vsantIntersect(nt1: VSANT, nt2: VSANT, newVSA: VSA) -> VSANT:
   newVSA.mem[resname] = res
 
   exchange = False
-  # if nt2.kind == 'U':
-  if nt2.kind == 'U' and nt1.kind != 'U':
+  if nt2.kind == 'U':
+  # if nt2.kind == 'U' and nt1.kind != 'U':
     nt1, nt2 = nt2, nt1
     exchange = True # exchange之后只会在下个if里用到
   if nt1.kind == 'U':

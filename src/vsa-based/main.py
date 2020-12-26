@@ -91,59 +91,66 @@ def readSygus(filename):
 
 def countNtermNum(vsa):
   cnt = 0
+  single = 0
   for x in vsa.mem.values():
     if x.kind != 'E':
       cnt += 1
-  return cnt
+    if x.kind == 'U' and len(x.prods) == 1:
+      single += 1
+  return cnt, single
 
 def debugTest(verbose = False):
   checker, StartSym, Productions, FuncDefineStr = readSygus(sys.argv[1])
   initialVSA = VSA()
   initialVSA.CFG2VSA(Productions, StartSym)
-  # initialVSA.print()
+  print('VSA size:', countNtermNum(initialVSA))
+  initialVSA.print()
   program0 = initialVSA.generateProgram()
   print(program0)
   # return None
 
   print('VSA1')
-  example = checker.generateSingleExample([1,0])
+  example = checker.generateSingleExample([0,1,2])
   example.print()
   VSA1 = example.generateVSA(initialVSA)
+  print('VSA size:', countNtermNum(VSA1))
   if verbose:
     VSA1.print()
   program1 = VSA1.generateProgram()
   print(program1)
 
   print('VSA2')
-  example = checker.generateSingleExample([0,1])
+  example = checker.generateSingleExample([2,0,1])
   example.print()
   VSA2 = example.generateVSA(initialVSA)
+  print('VSA size:', countNtermNum(VSA2))
   if verbose:
     VSA2.print()
   program2 = VSA2.generateProgram()
   print(program2)
 
-  # print('VSA3')
-  # example = checker.generateSingleExample([0,0,1])
-  # example.print()
-  # VSA3 = example.generateVSA(initialVSA)
-  # # VSA3.print()
-  # program3 = VSA3.generateProgram()
-  # print(program3)
+  print('VSA3')
+  example = checker.generateSingleExample([1,2,0])
+  example.print()
+  VSA3 = example.generateVSA(initialVSA)
+  # VSA3.print()
+  program3 = VSA3.generateProgram()
+  print(program3)
 
   print('VSA FINAL')
   VSAfinal = VSAIntersect(VSA1, VSA2)
+  print('VSA size:', countNtermNum(VSAfinal))
   if verbose:
     VSAfinal.print()
   program12 = VSAfinal.generateProgram()
-  tmp = VSAfinal.generateProgramBFS()
+  # tmp = VSAfinal.generateProgramBFS()
   print(program12)
-  print(tmp)
+  # print(tmp)
 
-  # VSAfinal = VSAIntersect(VSAfinal, VSA3)
-  # # VSAfinal.print()
-  # program = VSAfinal.generateProgram()
-  # print(program)
+  VSAfinal = VSAIntersect(VSAfinal, VSA3)
+  # VSAfinal.print()
+  program = VSAfinal.generateProgram()
+  print(program)
 
 def CEGIS(curVSA, checker, FuncDefineStr, initialVSA):
   while True:
