@@ -77,7 +77,7 @@ def foldMulti(name, li):
     return [name, li[0], li[1]]
   return [name, li[0], foldMulti(name, li[1:])]
 
-# NOTE: haven't tested
+# NOTE: haven't tested, and maybe won't be used
 def splitAndOr(cur):
   if type(cur) != list:
     return cur
@@ -103,7 +103,7 @@ def formatNormalize(constraints):
   # print('spec:')
   # pprint.pprint(spec)
 
-  spec = pushDownNot(spec) # TODO: construct example to test it
+  spec = pushDownNot(spec)
   # print('spec:')
   # pprint.pprint(spec)
 

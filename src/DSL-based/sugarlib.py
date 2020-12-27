@@ -47,6 +47,9 @@ class Desugar:
       elif cur[0] == '<' and '>=' in self.cfgSyntaxSet \
             and 'not' in self.cfgSyntaxSet:
         res = self.l2notge(cur)
+      elif cur[0] == '!=' and 'not' in self.cfgSyntaxSet \
+            and '=' in self.cfgSyntaxSet:
+        res = self.neq2noteq(cur)
       else:
         res = self.sugarSearch(cur)
         if not res:
@@ -92,6 +95,11 @@ class Desugar:
     right = self.desugar(cur[2])
     return ['not', ['>=', left, right]]
 
+  def neq2noteq(self, cur):
+    left = self.desugar(cur[1])
+    right = self.desugar(cur[2])
+    return ['not', ['=', left, right]]
+
   # ----------------------------------------------------------------
   # utilities for getting constants
   def getFalse(self):
@@ -121,3 +129,6 @@ class Desugar:
     if '=' in self.cfgSyntaxSet:
       return ['=', c, c]
     raise Exception('desugar error: no True')
+
+  def sugarSearch(self, cur):
+    return False
