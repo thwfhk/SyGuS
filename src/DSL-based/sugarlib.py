@@ -19,18 +19,18 @@ def varsMap(progExpr, paraList, argList):
 
 class Desugar:
   def __init__(self, progExpr, specSyntaxSet, cfgSyntaxSet, paraList, constList):
-    print('Desugar------------------------------------------')
-    print('progExpr', progExpr)
-    print('specSyntaxSet:', specSyntaxSet)
-    print('cfgSyntaxSet:', cfgSyntaxSet)
     self.progExpr = progExpr
     self.specSyntaxSet = specSyntaxSet
     self.cfgSyntaxSet = cfgSyntaxSet
     self.paraList = paraList
     self.constList = constList
     self.diff = specSyntaxSet - cfgSyntaxSet
-    print('diff:', self.diff)
-    print('Desugar------------------------------------------')
+    # print('Desugar------------------------------------------')
+    # print('progExpr', progExpr)
+    # print('specSyntaxSet:', specSyntaxSet)
+    # print('cfgSyntaxSet:', cfgSyntaxSet)
+    # print('diff:', self.diff)
+    # print('Desugar------------------------------------------')
 
   def desugar(self, cur):
     res = []
