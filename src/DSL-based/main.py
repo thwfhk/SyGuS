@@ -89,10 +89,15 @@ def main():
   # for c in checker.constraints:
   #   print(" ", c)
 
-  progExpr = spec2prog(checker.constraints, checker.synFunc, productions)
+  flag, progExpr = spec2prog(checker.constraints, checker.synFunc, productions)
+  if not flag:
+    print('synthesis failed:', progExpr)
+    return
+
   progStr = funcDefineStr[:-1] + ' ' + toString(progExpr) + funcDefineStr[-1]
+  print("----------------------------------------------------------------\nresult:");
   pprint.pprint(progExpr)
-  print(progStr)
+  print('progstr:', progStr)
   res, model = checker.check(progStr)
   print(res)
 

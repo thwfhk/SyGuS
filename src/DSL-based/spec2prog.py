@@ -138,13 +138,13 @@ def spec2prog(constraints, synFunc, productions):
     specTree = SpecTree(spec, synFunc.name)
     branch = specTree.spec2branch()
     if not branch.isequal: # can only handle equality constraints
-      return False
+      return False, 'unequal constraint on result'
     branchList.append(branch)
     specSyntaxSet |= specTree.getSyntaxSet()
     if argList == []:
       argList = specTree.argList
     elif argList != specTree.argList: # can only handle same arguments
-      return False
+      return False, 'different arguments'
 
   # get syntax used by cfg
   cfgSyntaxSet = set()
@@ -187,7 +187,7 @@ def spec2prog(constraints, synFunc, productions):
   desugar = Desugar(progExpr, specSyntaxSet, cfgSyntaxSet, paraList, constList)
   progExpr = desugar.desugar(progExpr)
 
-  return progExpr
+  return True, progExpr
 
 # 要处理guard == None的情况
 # 要处理else，其实直接把最后一个ite去掉就行

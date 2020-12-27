@@ -20,7 +20,7 @@ def varsMap(progExpr, paraList, argList):
 class Desugar:
   def __init__(self, progExpr, specSyntaxSet, cfgSyntaxSet, paraList, constList):
     print('Desugar------------------------------------------')
-    print(progExpr)
+    print('progExpr', progExpr)
     print('specSyntaxSet:', specSyntaxSet)
     print('cfgSyntaxSet:', cfgSyntaxSet)
     self.progExpr = progExpr
@@ -37,7 +37,6 @@ class Desugar:
     if type(cur) != list:
       return cur
     if cur[0] in self.diff:
-      print('********', cur[0])
       if cur[0] == 'and' and 'ite' in self.cfgSyntaxSet:
         res = self.and2ite(cur)
       elif cur[0] == 'max' and 'ite' in self.cfgSyntaxSet:
