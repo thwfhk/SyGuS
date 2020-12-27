@@ -91,7 +91,8 @@ def main():
 
   progExpr = spec2prog(checker.constraints, checker.synFunc, productions)
   progStr = funcDefineStr[:-1] + ' ' + toString(progExpr) + funcDefineStr[-1]
-  # print(progStr)
+  pprint.pprint(progExpr)
+  print(progStr)
   res, model = checker.check(progStr)
   print(res)
 
