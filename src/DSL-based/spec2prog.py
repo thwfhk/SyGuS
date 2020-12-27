@@ -172,9 +172,9 @@ def spec2prog(constraints, synFunc, productions):
       branch.guard = None
     branch.result = node2spec(branch.result) # TODO: branch may not have result, 但这样没有意义
 
-  # print('transformed branch guard and result:')
+  # print('transformed branch guard altnd result:')
   # for branch in branchList:
-  #   print(branch.guard, branch.result)
+  #   print(branch.guard, branch.resu)
 
   progExpr = iteCat(branchList)
   # print('progExpr:')
