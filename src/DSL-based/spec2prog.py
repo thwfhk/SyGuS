@@ -77,6 +77,7 @@ class SpecTree:
   def __init__(self, spec, funcName):
     self.root = spec2node(spec)
     self.funcName = funcName
+    self.argList = []
 
   def spec2branch(self):
     branch = Branch()
@@ -85,6 +86,7 @@ class SpecTree:
         return False
       if cur.name == self.funcName:
         parent.isend = True
+        self.argList = list(map(lambda x: x.value ,cur.children))
         if parent.name == '=':
           branch.isequal = True
           for sibling in parent.children:
@@ -127,6 +129,7 @@ class SpecTree:
 # return the program on sucess
 # return False on has unequal constraint
 def spec2prog(constraints, synFunc, productions):
+  argList = []
   # generate branch from constraint
   constraints = splitOr(constraints)
   branchList = []
@@ -138,6 +141,7 @@ def spec2prog(constraints, synFunc, productions):
       return False
     branchList.append(branch)
     specSyntaxSet |= specTree.getSyntaxSet()
+    argList = specTree.argList
 
   # get syntax used by cfg
   cfgSyntaxSet = set()
@@ -146,9 +150,9 @@ def spec2prog(constraints, synFunc, productions):
       if type(syntax) == list:
         cfgSyntaxSet.add(syntax[0])
 
-  print(branchList)
-  print('specSyntaxSet:', specSyntaxSet)
-  print('cfgSyntaxSet:', cfgSyntaxSet)
+  # print(branchList)
+  # print('specSyntaxSet:', specSyntaxSet)
+  # print('cfgSyntaxSet:', cfgSyntaxSet)
 
   # use 'and' to concatenate guard and transform to list format
   for branch in branchList:
@@ -164,17 +168,18 @@ def spec2prog(constraints, synFunc, productions):
       branch.guard = None
     branch.result = node2spec(branch.result) # TODO: may not have result
 
-  print('transformed branch guard and result:')
-  for branch in branchList:
-    print(branch.guard, branch.result)
+  # print('transformed branch guard and result:')
+  # for branch in branchList:
+  #   print(branch.guard, branch.result)
 
   progExpr = iteCat(branchList)
-  print('progExpr:')
-  pprint.pprint(progExpr)
+  # print('progExpr:')
+  # pprint.pprint(progExpr)
 
   # TODO: desugar
   # TODO: variable mapping
-  progExpr = varsMap(progExpr, synFunc)
+  paraList = list(map(lambda x: x[0], synFunc.argList))
+  progExpr = varsMap(progExpr, paraList, argList)
 
   return progExpr
 
@@ -190,8 +195,22 @@ def iteCat(branchList):
     cur = ['ite', branch.guard, branch.result, cur]
   return cur
 
-def varsMap(progExpr, synFunc):
-  print("----------------------------------------------------------------")
-  print(synFunc.argList)
-  print("----------------------------------------------------------------")
+def varsMap(progExpr, paraList, argList):
+  # print("----------------------------------------------------------------")
+  # print(paraList)
+  # print(argList)
+  arg2para = dict(zip(argList, paraList))
+  def dfs(cur):
+    if type(cur) != list:
+      return
+    for i, sub in enumerate(cur):
+      if i == 0:
+        continue
+      if type(sub) == list:
+        dfs(sub)
+      else:
+        if sub in arg2para:
+          cur[i] = arg2para[sub]
+  dfs(progExpr)
+  # print("----------------------------------------------------------------")
   return progExpr

@@ -82,16 +82,18 @@ def readSygus(filename):
 def main():
   checker, StartSym, productions, funcDefineStr = readSygus(sys.argv[1])
 
-  print("Productions:")
-  for k in productions:
-    print(" ", k, productions[k])
-  print("Constraints:")
-  for c in checker.constraints:
-    print(" ", c)
+  # print("Productions:")
+  # for k in productions:
+  #   print(" ", k, productions[k])
+  # print("Constraints:")
+  # for c in checker.constraints:
+  #   print(" ", c)
 
   progExpr = spec2prog(checker.constraints, checker.synFunc, productions)
   progStr = funcDefineStr[:-1] + ' ' + toString(progExpr) + funcDefineStr[-1]
-  print(progStr)
+  # print(progStr)
+  res, model = checker.check(progStr)
+  print(res)
 
 if __name__ == '__main__':
   main()
