@@ -44,7 +44,7 @@
 2. 分支提取
 3. 局部搜索，解语法糖
 
-具体三个步骤的描述我们会在作报告的时候详细描述，报告slides可以在(github)[https://github.com/thwfhk/SyGuS]上找到。
+具体三个步骤的描述我们会在作报告的时候详细描述，报告slides可以在[github repo](https://github.com/thwfhk/SyGuS)上找到。
 
 ### 新DSL+搜索
 
