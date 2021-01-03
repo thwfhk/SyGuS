@@ -91,7 +91,7 @@ def main():
         newBmExpr.append(line)
       else:
         newBmExpr.append(transConstArgs(line, funcName, paraList))
-    pprint.pprint(newBmExpr)
+    # pprint.pprint(newBmExpr)
     progStr = Run(newBmExpr) + ')'
     print(progStr)
     res, model = checker.check(progStr)
