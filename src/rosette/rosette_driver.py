@@ -355,5 +355,4 @@ def Run(bmExpr):
             ans += ") " + synth_fun_type + " "
             # print(ans)
             to_SyGus(out)
-            print(ans)
-            break
+            return ans
