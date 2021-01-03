@@ -10,6 +10,8 @@ from direct.spec2prog import *
 from direct.specformatter import *
 from rosette.rosette_driver import Run
 
+CandyQwQ = False
+
 def stripComments(bmFile):
   noComments = '('
   for line in bmFile:
@@ -82,7 +84,8 @@ def main():
   flag, progExpr = spec2prog(deepcopy(checker.constraints), checker.synFunc, productions)
   if not flag:
     # direct failed, try to use rosette
-    print('direct synthesis failed:', progExpr, '\nusing rosette:')
+    if CandyQwQ:
+      print('direct synthesis failed:', progExpr, '\nusing rosette:')
     paraList = list(map(lambda x: x[0], checker.synFunc.argList))
     funcName = checker.synFunc.name
     newBmExpr = []
@@ -94,16 +97,19 @@ def main():
     # pprint.pprint(newBmExpr)
     progStr = Run(newBmExpr) + ')'
     print(progStr)
-    res, model = checker.check(progStr)
-    print('checker result:', res)
+    if CandyQwQ:
+      res, model = checker.check(progStr)
+      print('checker result:', res)
   else:
     progStr = funcDefineStr[:-1] + ' ' + toString(progExpr) + funcDefineStr[-1]
     # print("----------------------------------------------------------------\nresult:");
     # pprint.pprint(progExpr)
-    print('direct synthesis sucess:')
+    if CandyQwQ:
+      print('direct synthesis sucess:')
     print(progStr)
-    res, model = checker.check(progStr)
-    print('checker result:', res)
+    if CandyQwQ:
+      res, model = checker.check(progStr)
+      print('checker result:', res)
 
 if __name__ == '__main__':
   main()
