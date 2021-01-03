@@ -1,3 +1,5 @@
+import pprint
+
 # map all variables in progExpr from argList to paraList
 def varsMap(progExpr, paraList, argList):
   # print("----------------------------------------------------------------")
@@ -17,6 +19,7 @@ def varsMap(progExpr, paraList, argList):
   # print("----------------------------------------------------------------")
   return dfs(progExpr)
 
+
 class Desugar:
   def __init__(self, progExpr, specSyntaxSet, cfgSyntaxSet, paraList, constList):
     self.progExpr = progExpr
@@ -31,6 +34,54 @@ class Desugar:
     # print('cfgSyntaxSet:', cfgSyntaxSet)
     # print('diff:', self.diff)
     # print('Desugar------------------------------------------')
+
+  def isCompVarConst(self, cur):
+    if not cur[0] in ['=', '!=', '<', '>', '<=', '>=']:
+      return False
+    if not cur[1] in self.paraList:
+      return False
+    if not type(cur[2]) == int:
+      return False
+    return True
+
+  def findMultiple(self, num):
+    for s in self.constList:
+      if s[-1].isdigit():
+        x = int(s)
+        if x != 0 and x % num == 0:
+          return x
+    return None
+
+  def constructMultiply(self, var, cnt):
+    if not '+' in self.cfgSyntaxSet:
+      raise Exception('we have no add :(')
+      # return False
+    res = var
+    for i in range(cnt-1):
+      res = ['+', res, var]
+    return res
+
+  # constList is of type [str]
+  # we only handle int constant
+  def desugarConstant(self, cur):
+    if type(cur) != list:
+      return cur
+    if self.isCompVarConst(cur):
+      var = cur[1]
+      num = cur[2]
+      if not str(num) in self.constList:
+        multiple = self.findMultiple(num)
+        if multiple is None:
+          raise Exception('cannot handle {}'.format(str(cur)))
+        cnt = multiple // num
+        res = [cur[0], self.constructMultiply(var, cnt), multiple]
+        return res
+      return cur
+    else:
+      res = [cur[0]]
+      for sub in cur[1:]:
+        res.append(self.desugarConstant(sub))
+      return res
 
   def desugar(self, cur):
     res = []

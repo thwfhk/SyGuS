@@ -151,8 +151,8 @@ class SpecTree:
 def spec2prog(constraints, synFunc, productions):
   paraList = list(map(lambda x: x[0], synFunc.argList))
   spec = formatNormalize(constraints, synFunc.name, paraList)
-  print('spec:')
-  pprint.pprint(spec)
+  # print('spec:')
+  # pprint.pprint(spec)
 
   specTree = SpecTree(spec, synFunc.name)
   specSyntaxSet, specConstList = specTree.getSyntaxSet()
@@ -178,8 +178,10 @@ def spec2prog(constraints, synFunc, productions):
         constList.append(syntax)
   # print(constList)
   # print(specConstList)
-  if not set(specConstList).issubset(set(constList)):
-    return False, 'constants not in CFG'
+
+  # Don't handle constants, just fail
+  # if not set(specConstList).issubset(set(constList)):
+  #   return False, 'constants not in CFG'
 
   # use 'and' to concatenate guard and transform to list format
   for branch in branchList:
@@ -204,13 +206,16 @@ def spec2prog(constraints, synFunc, productions):
   # print('progExpr:')
   # pprint.pprint(progExpr)
 
-  # TODO: 目前还没有考虑constants的事情
   # variable mapping
   progExpr = varsMap(progExpr, paraList, argList)
   # desugar
   desugar = Desugar(progExpr, specSyntaxSet, cfgSyntaxSet, paraList, constList)
-  progExpr = desugar.desugar(progExpr)
-
+  try:
+    progExpr = desugar.desugar(progExpr)
+    progExpr = desugar.desugarConstant(progExpr)
+  except Exception as e:
+    return False, 'desugar error: ' + str(e)
+  # pprint.pprint(progExpr)
   return True, progExpr
 
 # 要处理guard == None的情况
