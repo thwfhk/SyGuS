@@ -2,6 +2,7 @@ from __future__ import print_function
 from select import select
 from subprocess import Popen, PIPE
 import sys
+import time
 
 processes = [Popen(['./SyGuS-solver-exe', sys.argv[1]], stdout=PIPE,
                    bufsize=1, close_fds=True,
@@ -22,4 +23,4 @@ while not finish:
         for p in processes[:]:
             p.kill()
     else:
-        select([p.stdout for p in processes], [],[], timeout)[0]
+        time.sleep(0.5)
