@@ -36,8 +36,6 @@
     [(gt a b) (> (interpret a) (interpret b))]
     [_ p]))
 
-; (define (ans i1 i2) (ite1 (le1 i1 i2) i2 i1))
-; (displayln (interpret (ans 5 4)))
 
 ;;; SyGuS
 (displayln "-------- SyGuS --------")
@@ -75,7 +73,7 @@
 (define (constraint func x1 x2 x3 x4 x5 x6 x7 k)
   (let ([result (interpret (func x1 x2 x3 x4 x5 x6 x7 k))])
     (and
-(=> (and (< x1 x2) (and (< x2 x3) (and (< x3 x4) (and (< x4 x5) (and (< x5 x6) (< x6 x7)))))) (=> (< k x1) (= result 0)))
+(=> (and (< x1 x2) (and (< x2 x3) (and (< x3 x4) (and (< x4 x5) (and (< x5 x6) (< x6 x7)))))) (=> (< k x1) (= (interpret (func x1 x2 x3 x4 x5 x6 x7 k)) 0)))
 (=> (and (< x1 x2) (and (< x2 x3) (and (< x3 x4) (and (< x4 x5) (and (< x5 x6) (< x6 x7)))))) (=> (> k x7) (= result 7)))
 (=> (and (< x1 x2) (and (< x2 x3) (and (< x3 x4) (and (< x4 x5) (and (< x5 x6) (< x6 x7)))))) (=> (and (> k x1) (< k x2)) (= result 1)))
 (=> (and (< x1 x2) (and (< x2 x3) (and (< x3 x4) (and (< x4 x5) (and (< x5 x6) (< x6 x7)))))) (=> (and (> k x2) (< k x3)) (= result 2)))

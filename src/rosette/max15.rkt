@@ -8,29 +8,33 @@
 (define-symbolic x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 integer?)
 
 ; The syntax of the DSL.
-(struct Plus (left right) #:transparent)
-(struct Minus (left right) #:transparent)
-(struct Ite (bool left right) #:transparent)
+(struct plus (left right) #:transparent)
+(struct minus (left right) #:transparent)
+(struct ite (bool left right) #:transparent)
 (struct And (left right) #:transparent)
 (struct Or (left right) #:transparent)
 (struct Not (term) #:transparent)
-(struct Le (left right) #:transparent)
-(struct Eq (left right) #:transparent)
-(struct Ge (left right) #:transparent)
+(struct le (left right) #:transparent)
+(struct eq (left right) #:transparent)
+(struct ge (left right) #:transparent)
+(struct lt (left right) #:transparent)
+(struct gt (left right) #:transparent)
 (struct Max (left right) #:transparent)
 
 ; The semantics of the DSL.
 (define (interpret p)
   (match p
-    [(Plus a b) (+ (interpret a) (interpret b))]
-    [(Minus a b) (- (interpret a) (interpret b))]
-    [(Ite c a b) (if (interpret c) (interpret a) (interpret b))]
+    [(plus a b) (+ (interpret a) (interpret b))]
+    [(minus a b) (- (interpret a) (interpret b))]
+    [(ite c a b) (if (interpret c) (interpret a) (interpret b))]
     [(And a b) (and (interpret a) (interpret b))]
     [(Or a b) (or (interpret a) (interpret b))]
     [(Not a) (not (interpret a))]
-    [(Le a b) (<= (interpret a) (interpret b))]
-    [(Eq a b) (= (interpret a) (interpret b))]
-    [(Ge a b) (>= (interpret a) (interpret b))]
+    [(le a b) (<= (interpret a) (interpret b))]
+    [(eq a b) (= (interpret a) (interpret b))]
+    [(ge a b) (>= (interpret a) (interpret b))]
+    [(lt a b) (< (interpret a) (interpret b))]
+    [(gt a b) (> (interpret a) (interpret b))]
     [(Max a b) (max (interpret a) (interpret b))]
     [_ p]))
 
@@ -45,7 +49,7 @@
   (choose
     x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15
     ; 0 1
-    ; ((choose plus1 minus1)
+    ; ((choose plus minus)
     ;   (Start x1 x2 x3 x4 x5 (- depth 1))
     ;   (Start x1 x2 x3 x4 x5 (- depth 1)))
     ; (ite

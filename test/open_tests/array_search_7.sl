@@ -1,5 +1,9 @@
 (set-logic LIA)
-(synth-fun findIdx ( (y1 Int) (y2 Int) (y3 Int) (y4 Int) (y5 Int) (y6 Int) (y7 Int) (k1 Int)) Int ((Start Int ( 0 1 2 3 4 5 6 7 y1 y2 y3 y4 y5 y6 y7 k1 (ite BoolExpr Start Start))) (BoolExpr Bool ((< Start Start) (<= Start Start) (> Start Start) (>= Start Start)))))
+(synth-fun findIdx ( (y1 Int) (y2 Int) (y3 Int) (y4 Int) (y5 Int) (y6 Int) (y7 Int) (k1 Int)) Int 
+  ((Start Int 
+      ( 0 1 2 3 4 5 6 7 y1 y2 y3 y4 y5 y6 y7 k1 (ite BoolExpr Start Start)))
+   (BoolExpr Bool 
+      ((< Start Start) (<= Start Start) (> Start Start) (>= Start Start)))))
 (declare-var x1 Int)
 (declare-var x2 Int)
 (declare-var x3 Int)
