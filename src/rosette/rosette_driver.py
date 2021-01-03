@@ -25,9 +25,10 @@ def init():
     convert_operator["<"] = "lt"
     convert_operator[">"] = "gt"
     convert_operator["*"] = "mul"
-    convert_operator["div"] = "div"
+    convert_operator["div"] = "quotient"
     convert_operator["mod"] = "mod"
     convert_operator["abs"] = "Abs"
+
     revert_operator["ite"] = "ite"
     revert_operator["plus"] = "+"
     revert_operator["minus"] = "-"
@@ -40,7 +41,7 @@ def init():
     revert_operator["lt"] = "<"
     revert_operator["gt"] = ">"
     revert_operator["mul"] = "*"
-    revert_operator["div"] = "div"
+    revert_operator["quotient"] = "div"
     revert_operator["mod"] = "mod"
     revert_operator["Abs"] = "abs"
 
@@ -110,14 +111,25 @@ def run(bmExpr, depth):
     non_terms = SynFunExpr[4]
 
     # TODO add support for bool
-    proc += "(define-symbolic"
-    '''
-    for var in VarDecMap:
-        proc += " " + var
-    '''
+    contain_int = False
+    contain_bool = False
     for arg in synth_fun_args:
-        proc += " " + arg[0]
-    proc += " integer?)\n\n"
+        if arg[1] == "Int":
+            contain_int = True
+        elif arg[1] == "Bool":
+            contain_bool = True
+    if contain_int:
+        proc += "(define-symbolic"
+        for arg in synth_fun_args:
+            if arg[1] == "Int":
+                proc += " " + arg[0]
+        proc += " integer?)\n\n"
+    if contain_bool:
+        proc += "(define-symbolic"
+        for arg in synth_fun_args:
+            if arg[1] == "Bool":
+                proc += " " + arg[0]
+        proc += " boolean?)\n\n"
     # print(proc)
     proc += "(struct plus (left right) #:transparent)\n"
     proc += "(struct minus (left right) #:transparent)\n"

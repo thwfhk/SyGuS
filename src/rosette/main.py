@@ -41,7 +41,7 @@ if __name__ == '__main__':
     bm = stripComments(benchmarkFile)
     # Parse string to python list
     bmExpr = sexp.sexp.parseString(bm, parseAll=True).asList()[0]
-    rosette_driver.Run(bmExpr)
+    print(rosette_driver.Run(bmExpr))
     # pprint.pprint(bmExpr)
     '''
     checker = translator.ReadQuery(bmExpr)
