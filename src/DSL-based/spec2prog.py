@@ -15,7 +15,8 @@ class Branch:
   def __repr__(self):
     return 'Branch:\n  guard:' + str(self.guard) \
             + '\n  result: ' + str(self.result) \
-            + '\n  isequal: ' + str(self.isequal) + '\n'
+            + '\n  isequal: ' + str(self.isequal)\
+            + '\n  argList: ' + str(self.argList) + '\n'
 
 class SpecTreeNode:
   def __init__(self, spec):
@@ -144,14 +145,17 @@ class SpecTree:
 # return False on has unequal constraint
 def spec2prog(constraints, synFunc, productions):
   paraList = list(map(lambda x: x[0], synFunc.argList))
-  spec = formatNormalize(constraints)
+  spec = andCat(constraints)
+  spec = transConstArgs(spec, synFunc.name, paraList)
   # print('spec:')
   # pprint.pprint(spec)
+  spec = formatNormalize(spec)
 
   specTree = SpecTree(spec, synFunc.name)
   specSyntaxSet = specTree.getSyntaxSet()
   branchList = specTree.branchExtract()
   argList = branchList[0].argList
+  # print(specTree.root)
   # print(branchList)
 
   for branch in branchList:

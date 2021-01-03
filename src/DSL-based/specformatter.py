@@ -111,3 +111,32 @@ def formatNormalize(constraints):
   # print('spec:')
   # pprint.pprint(spec)
   return spec
+
+# NOTE: can only handle (=/>/< (f ...) ...)
+def transConstArgs(cur, funcName, paraList):
+  if type(cur) != list:
+    return cur
+  if cur[0] in ['=', '<', '>']:
+    condList = []
+    for i in [1, 2]:
+      sub = cur[i]
+      oth = cur[3-i]
+      if sub[0] != funcName:
+        continue
+      # we have (=/>/< (f ...) ...), transform it!
+      for i, a in enumerate(sub[1:]):
+        b = paraList[i]
+        if type(a) == tuple:
+          condList.append(['=', b, a[1]])
+          sub[i+1] = b
+      if len(condList) != 0:
+        res = ['=>']
+        res.append(andCat(condList))
+        res.append(cur)
+        return res
+      return cur
+  res = [cur[0]]
+  for sub in cur[1:]:
+    res.append(transConstArgs(sub, funcName, paraList))
+  return res
+
