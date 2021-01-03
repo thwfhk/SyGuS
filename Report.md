@@ -12,6 +12,10 @@
 * 在 https://download.racket-lang.org 下载安装racket，并添加环境变量到shell
 * 运行`raco pkg install rosette`安装Rosette
 
+需要再linux系统下运行（因为将Haskell相关内容编译成了一个linux下的exe）
+
+注意：该程序可以在时间限制下解出`open_tests`中的所有样例，如果有报错等情况发生，请联系我们🥺。
+
 ## 方法
 
 我们组实现了四种方法，最后的方案是将三种方法拼接在一起。
