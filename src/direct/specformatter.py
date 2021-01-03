@@ -93,9 +93,10 @@ def splitAndOr(cur):
     return res
 
 
-def formatNormalize(constraints):
+def formatNormalize(constraints, funcName, paraList):
   # use 'and' to connect constraints
   spec = andCat(constraints)
+  spec = transConstArgs(spec, funcName, paraList)
   # print('spec:')
   # pprint.pprint(spec)
 
@@ -127,7 +128,7 @@ def transConstArgs(cur, funcName, paraList):
       for i, a in enumerate(sub[1:]):
         b = paraList[i]
         if type(a) == tuple:
-          condList.append(['=', b, a[1]])
+          condList.append(['=', b, ('Int', a[1])])
           sub[i+1] = b
       if len(condList) != 0:
         res = ['=>']

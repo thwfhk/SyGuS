@@ -131,28 +131,31 @@ class SpecTree:
 
   def getSyntaxSet(self):
     syntaxSet = set()
+    constList = []
     def dfs(cur):
-      if cur.name == self.funcName or cur.isleaf:
+      if cur.name == self.funcName:
+        return
+      if cur.isleaf:
+        if type(cur.value) == int:
+          constList.append(str(cur.value))
         return
       syntaxSet.add(cur.name)
       for child in cur.children:
         dfs(child)
     dfs(self.root)
-    return syntaxSet
+    return syntaxSet, constList
 
 # directly generate program from constraint specifications
 # return the program on sucess
 # return False on has unequal constraint
 def spec2prog(constraints, synFunc, productions):
   paraList = list(map(lambda x: x[0], synFunc.argList))
-  spec = andCat(constraints)
-  spec = transConstArgs(spec, synFunc.name, paraList)
-  # print('spec:')
-  # pprint.pprint(spec)
-  spec = formatNormalize(spec)
+  spec = formatNormalize(constraints, synFunc.name, paraList)
+  print('spec:')
+  pprint.pprint(spec)
 
   specTree = SpecTree(spec, synFunc.name)
-  specSyntaxSet = specTree.getSyntaxSet()
+  specSyntaxSet, specConstList = specTree.getSyntaxSet()
   branchList = specTree.branchExtract()
   argList = branchList[0].argList
   # print(specTree.root)
@@ -173,6 +176,10 @@ def spec2prog(constraints, synFunc, productions):
         cfgSyntaxSet.add(syntax[0])
       elif not syntax in paraList and not syntax in productions:
         constList.append(syntax)
+  # print(constList)
+  # print(specConstList)
+  if not set(specConstList).issubset(set(constList)):
+    return False, 'constants not in CFG'
 
   # use 'and' to concatenate guard and transform to list format
   for branch in branchList:
@@ -194,8 +201,8 @@ def spec2prog(constraints, synFunc, productions):
   #   print(branch.guard, branch.resu)
 
   progExpr = iteCat(branchList)
-  print('progExpr:')
-  pprint.pprint(progExpr)
+  # print('progExpr:')
+  # pprint.pprint(progExpr)
 
   # TODO: 目前还没有考虑constants的事情
   # variable mapping

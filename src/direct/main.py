@@ -1,9 +1,9 @@
+import os
 import sys
 import sexp
 import pprint
 from checker import *
 from utils import *
-from getproductions import *
 from spec2prog import *
 
 def stripComments(bmFile):
@@ -64,9 +64,6 @@ def readSygus(filename):
       productions[StartSym].append(ntName) # 'My-Start-Symbol' : 'Start'
     Type[ntName] = ntType
     productions[ntName] = []
-    # if "max" in SynFunExpr[1]:
-      # getproductionsMax(productions[NTName], NonTerm[2])
-    # else:
     for subnt in nterm[2]:
       if type(subnt) == tuple:
         productions[ntName].append(str(subnt[1]))
