@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import pprint
 from copy import deepcopy
 sys.path.append(os.path.join(os.getcwd(), os.path.join("src", "direct")))
@@ -86,6 +87,7 @@ def main():
     # direct failed, try to use rosette
     if CandyQwQ:
       print('direct synthesis failed:', progExpr, '\nusing rosette:')
+    time.sleep(10)
     paraList = list(map(lambda x: x[0], checker.synFunc.argList))
     funcName = checker.synFunc.name
     newBmExpr = []
