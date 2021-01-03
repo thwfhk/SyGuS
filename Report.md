@@ -71,3 +71,5 @@ Rosette是Racket的一个库，提供了solver-aided programming，将代码与S
 Rosette中提供了一个`define-sythax`，可以定义一个CFG语法并展开k层，然后进行程序综合。并且使用了一种算法来合并相同的符号表达式提高效率。
 
 我们将基于Rosette实现的程序综合方法作为“直接法”和“新DSL+搜索”都解不出来的时候的最后方法。
+
+**最终`wrapper.py`里是并行跑了“新DSL+搜索”法与“先直接法后Rosette”。**
