@@ -1,0 +1,3 @@
+[submodule "src/search"]
+	path = src/search
+	url = git@github.com:Krantz-XRF/SyGuS-solver.git
