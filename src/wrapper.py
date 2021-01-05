@@ -4,7 +4,7 @@ from subprocess import Popen, PIPE
 import sys
 import time
 
-processes = [Popen(['./SyGuS-solver-exe', sys.argv[1]], stdout=PIPE,
+processes = [Popen(['./SyGuS-solver-mac', sys.argv[1]], stdout=PIPE,
            bufsize=1, close_fds=True,
            universal_newlines=True),
        Popen(['python3', 'src/final.py', sys.argv[1]], stdout=PIPE,
@@ -19,13 +19,13 @@ while not finish:
       res = p.stdout.read()
       p.kill()
       processes.remove(p)
-      if res == 'No answer.\n':
+      if res == '':
         continue
       print(res, end='')
       finish = True
   if finish:
-    for p in processes[:]:
+    for p in processes:
       p.kill()
   else:
-    select([p.stdout for p in processes], [],[], timeout)[0]
-    # time.sleep(0.5)
+    # select([p.stdout for p in processes], [],[], timeout)[0]
+    time.sleep(0.5)
