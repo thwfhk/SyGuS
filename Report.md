@@ -6,7 +6,7 @@
 
 ## 运行
 
-在根目录下执行`python src/wrapper.py test/open_test/filename.sl`进行测试.
+在根目录下执行`./wrapper.sh test/open_test/filename.sl`进行测试.
 
 需要Racket和Rosette支持：
 * 在 https://download.racket-lang.org 下载安装racket，并添加环境变量到shell
