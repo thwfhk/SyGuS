@@ -94,7 +94,7 @@ def main():
   progStr = funcDefineStr[:-1] + ' ' + toString(progExpr) + funcDefineStr[-1]
   # print("----------------------------------------------------------------\nresult:");
   # pprint.pprint(progExpr)
-  print('progstr:', progStr)
+  # print('progstr:', progStr)
   res, model = checker.check(progStr)
   print(res)
 

@@ -151,8 +151,8 @@ class SpecTree:
 def spec2prog(constraints, synFunc, productions):
   paraList = list(map(lambda x: x[0], synFunc.argList))
   spec = formatNormalize(constraints, synFunc.name, paraList)
-  print('formalized spec:')
-  pprint.pprint(spec)
+  # print('formalized spec:')
+  # pprint.pprint(spec)
 
   specTree = SpecTree(spec, synFunc.name)
   specSyntaxSet, specConstList = specTree.getSyntaxSet()
@@ -215,7 +215,7 @@ def spec2prog(constraints, synFunc, productions):
     progExpr = desugar.desugarConstant(progExpr)
   except Exception as e:
     return False, 'desugar error: ' + str(e)
-  pprint.pprint(progExpr)
+  # pprint.pprint(progExpr)
   return True, progExpr
 
 # 要处理guard == None的情况
