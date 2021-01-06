@@ -24,6 +24,8 @@ while not finish:
     if not out == "":
       finish = True
       break
+    else:
+      processes.remove(p)
 print(out, end="")
 for p in processes:
   p.kill()
