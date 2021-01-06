@@ -5,7 +5,7 @@ import sys
 import time
 
 processes = [
-  Popen(['./SyGuS-solver-mac', sys.argv[1]], stdout=PIPE,
+  Popen(['./SyGuS-solver-exe', sys.argv[1]], stdout=PIPE,
     bufsize=1, close_fds=True,
     universal_newlines=True),
   Popen(['python3', 'src/direct/directwrapper.py', sys.argv[1]], stdout=PIPE,
