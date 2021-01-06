@@ -19,7 +19,7 @@
 
 (constraint (or (and (= x y) (= (f x y) (+ x y)))
             (or (and (> x y) (= (f x y) 1))
-				(and (< x y) (= (f x y) -1)))))
+            (and (< x y) (= (f x y) -1)))))
 
 (check-synth)
 

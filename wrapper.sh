@@ -1,4 +1,4 @@
-./SyGuS-solver-exe $1 > tmp1 &
+./SyGuS-solver-mac $1 > tmp1 &
 python3 src/final.py $1 > tmp2 &
 while true; do
     sleep 1
